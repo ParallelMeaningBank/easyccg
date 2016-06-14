@@ -15,7 +15,7 @@
             <zipfileset excludes="META-INF/*.SF" src="lib/edu.mit.jwi_2.3.0.jar"/>
         </jar>
     </target>
-    <target name="compile">
+    <target name="compile" depends="init">
         <javac srcdir="src" destdir="bin">
             <classpath>
                 <pathelement location="lib/guava-15.0.jar"/>
@@ -24,5 +24,8 @@
                 <pathelement location="lib/edu.mit.jwi_2.3.0.jar"/>
             </classpath>
         </javac>
+    </target>
+    <target name="init">
+        <mkdir dir="bin"/>
     </target>
 </project>
