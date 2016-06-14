@@ -2,7 +2,7 @@
 <project default="create_run_jar" name="Create Runnable Jar for Project easyccg">
     <!--this file was created by Eclipse Runnable JAR Export Wizard-->
     <!--ANT 1.7 is required                                        -->
-    <target name="create_run_jar">
+    <target name="create_run_jar" depends="compile">
         <jar destfile="easyccg.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="uk.ac.ed.easyccg.main.EasyCCG"/>
@@ -14,5 +14,15 @@
             <zipfileset excludes="META-INF/*.SF" src="lib/jewelcli-0.7.6.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="lib/edu.mit.jwi_2.3.0.jar"/>
         </jar>
+    </target>
+    <target name="compile">
+        <javac srcdir="src" destdir="bin">
+            <classpath>
+                <pathelement location="lib/guava-15.0.jar"/>
+                <pathelement location="lib/mtj-1.0-snapshot.jar"/>
+                <pathelement location="lib/jewelcli-0.7.6.jar"/>
+                <pathelement location="lib/edu.mit.jwi_2.3.0.jar"/>
+            </classpath>
+        </javac>
     </target>
 </project>
