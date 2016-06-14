@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.InputMismatchException;
 import java.util.Iterator;
 import java.util.List;
@@ -88,15 +89,25 @@ public abstract class InputReader
   public static class InputToParser {
     private final List<InputWord> words;
     private boolean isAlreadyTagged;
-    InputToParser(List<InputWord> words, List<Category> goldCategories, List<List<SyntaxTreeNodeLeaf>> inputSupertags, boolean isAlreadyTagged)
+    /*InputToParser(List<InputWord> words, List<Category> goldCategories, List<List<SyntaxTreeNodeLeaf>> inputSupertags, boolean isAlreadyTagged)
+    {
+      this(words, goldCategories, inputSupertags, isAlreadyTagged, new ArrayList<List<SyntaxTreeNodeLeaf>>(words.size()));
+      for (int i = 0; i < words.size(); i++)
+      {
+          supertagConstraints.add(null);
+      }
+    }*/
+    InputToParser(List<InputWord> words, List<Category> goldCategories, List<List<SyntaxTreeNodeLeaf>> inputSupertags, boolean isAlreadyTagged, List<List<SyntaxTreeNodeLeaf>> supertagConstraints)
     {
       this.words = words;
       this.goldCategories = goldCategories;
       this.inputSupertags = inputSupertags;
       this.isAlreadyTagged = isAlreadyTagged;
+      this.supertagConstraints = supertagConstraints;
     }
     private final List<Category> goldCategories;
     private final List<List<SyntaxTreeNodeLeaf>> inputSupertags;
+    private final List<List<SyntaxTreeNodeLeaf>> supertagConstraints;
     public int length()
     {
       return words.size();
@@ -112,6 +123,17 @@ public abstract class InputReader
     public List<List<SyntaxTreeNodeLeaf>> getInputSupertags()
     {
       return inputSupertags;
+    }
+    
+    /**
+     * @return A list with one element for each token in the sentence. For
+     * elements that are null, the parser should behave normally. For elements
+     * that are lists of leaves, it should only consider those possible leaf
+     * nodes, ignoring both inputSupertags (if any) and the tagger.
+     */
+    public List<List<SyntaxTreeNodeLeaf>> getSupertagConstraints()
+    {
+        return supertagConstraints;
     }
     
     public List<SyntaxTreeNodeLeaf> getInputSupertags1best()
@@ -152,7 +174,7 @@ public abstract class InputReader
       for (String word : tokens) {
         inputWords.add(new InputWord(word, null, null));
       }
-      return new InputToParser(inputWords, null, null, false);
+      return new InputToParser(inputWords, null, null, false, null);
     }
     
   }
@@ -166,6 +188,48 @@ public abstract class InputReader
       //TODO quotes
       return InputToParser.fromTokens(Arrays.asList(line.replaceAll("\"", "").replaceAll("  +", " ").trim().split(" ")));
     }
+  }
+  
+  private static class ConstrainedInputReader extends InputReader {
+
+    private ConstrainedInputReader(SyntaxTreeNodeFactory nodeFactory)
+    {
+      this.nodeFactory = nodeFactory;
+    }
+
+    private final SyntaxTreeNodeFactory nodeFactory;
+    
+    @Override
+    public InputToParser readInput(String line)
+    {
+      // Format:
+      // Pierre|N Vinken|N ,| 61| years| old|N\N ...
+      // A bar followed by nothing is interpreted as unconstrained, i.e. the
+      // parser should tag this token itself. We use the bar in such cases so
+      // we remain able to handle tokens with bars in them.
+      // TODO quotes
+      String[] taggedEntries = line.replaceAll("\"", "").replaceAll("  +", " ").trim().split(" ");
+      List<InputWord> words = new ArrayList<>(taggedEntries.length);
+      List<List<SyntaxTreeNodeLeaf>> supertagConstraints = new ArrayList<>();
+      
+      for (int i = 0; i < taggedEntries.length; i++) {
+        int barIndex = taggedEntries[i].lastIndexOf('|');
+        assert barIndex >= 0;
+        String word = taggedEntries[i].substring(0, barIndex);
+        words.add(new InputWord(word));
+        
+        if (barIndex == taggedEntries[i].length() - 1) {
+          supertagConstraints.add(null);
+        } else {
+          String supertag = taggedEntries[i].substring(barIndex + 1);
+          supertagConstraints.add(Collections.singletonList(nodeFactory.makeTerminal(word, Category.valueOf(supertag), null, null, 0.0, supertagConstraints.size())));
+        }
+             
+      }
+      
+      return new InputToParser(words, null, null, false, supertagConstraints);
+    }
+    
   }
 
   /**
@@ -207,7 +271,7 @@ public abstract class InputReader
         supertags.add(entries);
       }
       
-      return new InputToParser(words, null, supertags, true);
+      return new InputToParser(words, null, supertags, true, null);
     }
     
   }
@@ -236,7 +300,7 @@ public abstract class InputReader
         result.add(category);
         supertags.add(Arrays.asList(nodeFactory.makeTerminal(word, category, pos, null, 1.0, supertags.size())));
       }
-      return new InputToParser(words, result, supertags, false);
+      return new InputToParser(words, result, supertags, false, null);
     }    
     
     private GoldInputReader(SyntaxTreeNodeFactory nodeFactory)
@@ -260,7 +324,7 @@ public abstract class InputReader
         if (taggedFields[0].equals("\"")) continue ; //TODO quotes
         inputWords.add(new InputWord(taggedFields[0], taggedFields[1], null));
       }
-      return new InputToParser(inputWords, null, null, false);
+      return new InputToParser(inputWords, null, null, false, null);
     }    
   }
   
@@ -279,7 +343,7 @@ public abstract class InputReader
         		"The C&C can produce this format using: \"bin/pos -model models/pos | bin/ner -model models/ner -ofmt \"%w|%p|%n \\n\"\"" );
         inputWords.add(new InputWord(taggedFields[0], taggedFields[1], taggedFields[2]));
       }
-      return new InputToParser(inputWords, null, null, false);
+      return new InputToParser(inputWords, null, null, false, null);
     }    
   }
 
@@ -290,7 +354,8 @@ public abstract class InputReader
     case TOKENIZED : return new RawInputReader();  
     case GOLD : return new GoldInputReader(nodeFactory);  
     case POSTAGGED : return new POSTaggedInputReader();  
-    case POSANDNERTAGGED : return new POSandNERTaggedInputReader();  
+    case POSANDNERTAGGED : return new POSandNERTaggedInputReader(); 
+    case SUPERTAGCONSTRAINED : return new ConstrainedInputReader(nodeFactory);
     default : throw new Error("Unknown input format: " + inputFormat);
     }
   }

@@ -98,7 +98,7 @@ public class EasyCCG
 
   // Set of supported InputFormats
   public enum InputFormat {
-    TOKENIZED, GOLD, SUPERTAGGED, POSTAGGED, POSANDNERTAGGED
+    TOKENIZED, GOLD, SUPERTAGGED, POSTAGGED, POSANDNERTAGGED, SUPERTAGCONSTRAINED;
   }
 
   // Set of supported OutputFormats

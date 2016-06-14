@@ -259,6 +259,19 @@ public class ParserAStar implements Parser
       }
     }
     
+    // For tokens that are constrained to a specific supertag, replace the
+    // supertag distributions accordingly.
+    if (input.getSupertagConstraints() != null) {
+      for (int i = 0; i < input.length(); i++) {
+        List<SyntaxTreeNodeLeaf> constraint = input.getSupertagConstraints().get(i);
+        
+        if (constraint != null) {
+          supertags.remove(i);
+          supertags.add(i, constraint);
+        }
+      }
+    }
+    
     try{
       parsingTimeOnly.start();
       List<SyntaxTreeNode> parses = parseAstar(supertags);
