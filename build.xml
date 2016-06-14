@@ -24,6 +24,11 @@
                 <pathelement location="lib/edu.mit.jwi_2.3.0.jar"/>
             </classpath>
         </javac>
+        <copy todir="bin/uk/ac/ed/easyccg/lemmatizer">
+            <fileset dir="src">
+                <include name="uk/ac/ed/easyccg/lemmatizer/*.exc"/>
+            </fileset>
+        </copy>
     </target>
     <target name="init">
         <mkdir dir="bin"/>
