@@ -28,9 +28,6 @@ public abstract class ParsePrinter
   public String print(List<SyntaxTreeNode> parses, int id)
   {
     StringBuilder result = new StringBuilder();
-    if (id == 1) {
-    	printFileHeader(result);
-    }
 
     if (parses == null) {
       if (id > -1) printHeader(id, result);
@@ -70,7 +67,8 @@ public abstract class ParsePrinter
   }
 
 
-  abstract void printFileHeader(StringBuilder result);
+  public abstract String printFileHeader();
+  
   abstract void printFailure(StringBuilder result);
   abstract void printHeader(int id, StringBuilder result);
   abstract void printFooter(StringBuilder result);
@@ -178,8 +176,9 @@ public abstract class ParsePrinter
     }
 
     @Override
-    void printFileHeader(StringBuilder result)
+    public String printFileHeader()
     {
+      return "";
     }
   }
 
@@ -252,9 +251,11 @@ public abstract class ParsePrinter
         return result;
       }
     }
+    
     @Override
-    void printFileHeader(StringBuilder result)
+    public String printFileHeader()
     {
+      return "";
     }
 
     int getRows(SyntaxTreeNode node, List<List<SyntaxTreeNode>> result, int minIndentation) {
@@ -295,8 +296,9 @@ public abstract class ParsePrinter
   public static class SupertagPrinter extends ParsePrinter {
 
     @Override
-    void printFileHeader(StringBuilder result)
+    public String printFileHeader()
     {
+      return "";
     }
 
     @Override
@@ -368,13 +370,13 @@ w(2, 3, 'cake', 'cake', 'NN', 'I-NP', 'O', 'N').
     }
 
     @Override
-    void printFileHeader(StringBuilder result)
+    public String printFileHeader()
     {
-      result.append(":- multifile w/8, ccg/2, id/2.\n" + 
+      return ":- multifile w/8, ccg/2, id/2.\n" + 
           ":- discontiguous w/8, ccg/2, id/2.\n" + 
           ":- dynamic w/8, ccg/2, id/2.\n" + 
           "\n" + 
-      "");
+      "";
     }
 
 
@@ -487,13 +489,13 @@ w(2, 3, 'cake', 'cake', 'NN', 'I-NP', 'O', 'N').
 	    }
 	    
 	    @Override
-	    void printFileHeader(StringBuilder result)
+	    public String printFileHeader()
 	    {
-	        result.append(":- op(601, xfx, (/)).\n" + 
+	        return ":- op(601, xfx, (/)).\n" + 
 	          		":- op(601, xfx, (\\)).\n" + 
 	          		":- multifile ccg/2, id/2.\n" + 
 	          		":- discontiguous ccg/2, id/2.\n" + 
-	          		"\n");
+	          		"\n";
 	        }
 	    
 	    @Override
@@ -710,8 +712,9 @@ w(2, 3, 'cake', 'cake', 'NN', 'I-NP', 'O', 'N').
     }
 
     @Override
-    void printFileHeader(StringBuilder result)
+    public String printFileHeader()
     {
+      return "";
     }
 
   }
@@ -719,11 +722,11 @@ w(2, 3, 'cake', 'cake', 'NN', 'I-NP', 'O', 'N').
   public static class DependenciesPrinter extends ParsePrinter {
 
     @Override
-    void printFileHeader(StringBuilder result)
+    public String printFileHeader()
     {
-      result.append("Empty header\n");
-      result.append("To keep C&C evaluate script happy\n");
-      result.append("\n");
+      return "Empty header\n" +
+          "To keep C&C evaluate script happy\n" +
+          "\n";
     }
 
     @Override

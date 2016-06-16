@@ -199,6 +199,9 @@ public class EasyCCG
 
     final BufferedWriter sysout = new BufferedWriter(new OutputStreamWriter(System.out));
     
+    sysout.write(printer.printFileHeader());
+    if (readingFromStdin) sysout.flush();
+    
     int id = 0;
     while (inputLines.hasNext()) { 
       // Read each sentence, either from STDIN or a parse.
