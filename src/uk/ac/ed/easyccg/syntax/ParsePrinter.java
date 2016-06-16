@@ -517,7 +517,6 @@ w(2, 3, 'cake', 'cake', 'NN', 'I-NP', 'O', 'N').
 	    void printParse(SyntaxTreeNode parse, int sentenceNumber, StringBuilder result)
 	    {
 	      printDerivation(parse, sentenceNumber, result);
-	      result.append("\n");
 	    }
 	    
 	    void printTerminal(SyntaxTreeNodeLeaf word, StringBuilder result) {
