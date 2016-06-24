@@ -207,8 +207,7 @@ public abstract class InputReader
       // A bar followed by nothing is interpreted as unconstrained, i.e. the
       // parser should tag this token itself. We use the bar in such cases so
       // we remain able to handle tokens with bars in them.
-      // TODO quotes
-      String[] taggedEntries = line.replaceAll("\"", "").replaceAll("  +", " ").trim().split(" ");
+      String[] taggedEntries = line.replaceAll("  +", " ").trim().split(" ");
       List<InputWord> words = new ArrayList<>(taggedEntries.length);
       List<List<SyntaxTreeNodeLeaf>> supertagConstraints = new ArrayList<>();
       
