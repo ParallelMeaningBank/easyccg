@@ -222,34 +222,37 @@ public class EasyCCG
         // Make a new ExecutorService job for each sentence to parse.
         executorService.execute(new Runnable() {
           public void run() {
-
-            List<SyntaxTreeNode> parses = parser.parse(supertaggingResults, line);
-            String output;
-            if (parses != null && usingGoldFile) {
-              if (goldParse != null) {
-                output = printer.print(Evaluate.getOracle(parses, goldParse), id2);                
+            String output = "";
+            
+            try {
+              List<SyntaxTreeNode> parses = parser.parse(supertaggingResults, line);
+              
+              if (parses != null && usingGoldFile) {
+                if (goldParse != null) {
+                  output = printer.print(Evaluate.getOracle(parses, goldParse), id2);                
+                } else {
+                  // Just print 1-best when doing Oracle experiments.
+                  output = printer.print(parses.subList(0, 1), id2);
+                }
               } else {
-                // Just print 1-best when doing Oracle experiments.
-                output = printer.print(parses.subList(0, 1), id2);
+                // Not doing Oracle experiments - print all ouput.
+                output = printer.print(parses, id2);
               }
               
-            } else {
-              // Not doing Oracle experiments - print all ouput.
-              output = printer.print(parses, id2);
-            }
+            } finally {
+              synchronized (printer) {
+                try
+                {
+                  // It's a bit faster to buffer output than use System.out.println() directly.
+                  sysout.write(output);
+                  sysout.newLine();
 
-            synchronized (printer) {
-              try
-              {
-                // It's a bit faster to buffer output than use System.out.println() directly.
-                sysout.write(output);
-                sysout.newLine();
-                
-                if (readingFromStdin) sysout.flush();
-              }
-              catch (IOException e)
-              {
-                throw new RuntimeException(e);
+                  if (readingFromStdin) sysout.flush();
+                }
+                catch (IOException e)
+                {
+                  throw new RuntimeException(e);
+                }
               }
             }
           }
