@@ -352,9 +352,10 @@ public class ParserAStar implements Parser
       }
     }
         
+    int parsesFound = 0;
    
     while (chart[0][sentenceLength - 1] == null || 
-           (chart[0][sentenceLength - 1].getEntries().size() < nbest 
+           (parsesFound < nbest 
            && agenda.peek() != null && agenda.peek().cost > chart[0][sentenceLength - 1].bestValue + nbestBeam
            )) {
       // Add items from the agenda, until we have enough parses.
@@ -373,13 +374,20 @@ public class ParserAStar implements Parser
 
       
       if (cell.add(agendaItem.parse)) {
-        // If a new entry was added, update the agenda.
+        // If a new entry was added, count a new parse if applicable...
+        
+        if (agendaItem.spanLength == sentenceLength &&
+            possibleRootCategories.contains(agendaItem.parse.getCategory())) {
+          parsesFound++;
+        }
+        
+        // ... and update the agenda.
 
         //See if any Unary Rules can be applied to the new entry.
         for (Category unaryRuleProduction : unaryRules.get(agendaItem.parse.getCategory())) {
-          if (agendaItem.spanLength == sentenceLength) {
+          /* if (agendaItem.spanLength == sentenceLength) {
             break ;
-          }
+          } */
           
           agenda.add(new AgendaItem(nodeFactory.makeUnary(unaryRuleProduction, agendaItem.parse), 
               outsideProbabilitiesUpperBound[agendaItem.startOfSpan][agendaItem.startOfSpan + agendaItem.spanLength],                             
@@ -409,13 +417,20 @@ public class ParserAStar implements Parser
       }      
     }
 
-    if (chart[0][sentenceLength - 1] == null) {
+    if (parsesFound == 0) {
       // Parse failure.
       return null;
     }
     
     // Read the parses out of the final cell.
-    List<SyntaxTreeNode> parses = new ArrayList<SyntaxTreeNode>(chart[0][sentenceLength - 1].getEntries());
+    List<SyntaxTreeNode> parses = new ArrayList<SyntaxTreeNode>();
+    
+    for (SyntaxTreeNode parse : chart[0][sentenceLength - 1].getEntries()) {
+      // Enforce that the root node must have one of a pre-specified list of categories.
+      if (possibleRootCategories.contains(parse.getCategory())) {
+        parses.add(parse);
+      }
+    }
     
     // Sort the parses by probability.
     Collections.sort(parses);
@@ -491,9 +506,6 @@ public class ParserAStar implements Parser
                  production.ruleType == RuleType.BA && rightChild.getCategory().isBackwardTypeRaised()) {
         // Hockenmaier normal form constraint.
         continue;
-      }else if (spanLength == sentenceLength && !possibleRootCategories.contains(production.category)) {
-        // Enforce that the root node must have one of a pre-specified list of categories.
-        continue ;
       } else {
         agenda.add(new AgendaItem(
             nodeFactory.makeBinary(production.category, leftChild, rightChild, production.ruleType, production.headIsLeft),
