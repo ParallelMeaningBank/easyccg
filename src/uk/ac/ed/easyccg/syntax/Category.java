@@ -167,6 +167,8 @@ public abstract class Category {
   public String toString() {
     return asString;
   }
+  
+  public abstract String toProlog();
 
   @Override
   public boolean equals(Object other) {
@@ -190,6 +192,7 @@ public abstract class Category {
   abstract String getFeature();
 
   abstract String toStringWithBrackets();
+  abstract String toPrologWithBrackets();
   public abstract Category dropPPandPRfeatures();
 
   static class FunctorCategory extends Category {
@@ -244,11 +247,23 @@ public abstract class Category {
     {
       throw new UnsupportedOperationException();
     }
+    
+    @Override
+    public String toProlog()
+    {
+      return left.toPrologWithBrackets() + slash + right.toPrologWithBrackets();
+    }
 
     @Override
     String toStringWithBrackets()
     {
       return "(" + toString() + ")";
+    }
+
+    @Override
+    String toPrologWithBrackets()
+    {
+      return "(" + toProlog() + ")";
     }
 
     @Override
@@ -418,11 +433,27 @@ public abstract class Category {
     {
       return feature;
     }
+    
+    @Override
+    public String toProlog()
+    {
+      if (feature == null) {
+        return type.toLowerCase();
+      } else {
+        return type.toLowerCase() + ":" + feature;
+      }
+    }
 
     @Override
     String toStringWithBrackets()
     {
       return toString();
+    }
+    
+    @Override
+    String toPrologWithBrackets()
+    {
+      return toProlog();
     }
 
     @Override

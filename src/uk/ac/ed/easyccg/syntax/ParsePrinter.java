@@ -521,13 +521,7 @@ w(2, 3, 'cake', 'cake', 'NN', 'I-NP', 'O', 'N').
 	    
 	    void printTerminal(SyntaxTreeNodeLeaf word, StringBuilder result) {
 	    	String featureList = buildFeatureList(word);
-	    	
-	    	String cat = word.getCategory().toString().toLowerCase();
-	        cat = cat.replaceAll("\\[([a-z]+)\\]", ":$1");
-	    	if (cat.equals(".")) {
-	    		cat = "period";
-	    	}
-	    	
+	    	String cat = word.getCategory().toProlog();	    	
 	    	result.append("t(" + cat + ", '" + escape(word.getWord()) + "', " + featureList + ")");
 	    }
 	    
@@ -580,8 +574,7 @@ w(2, 3, 'cake', 'cake', 'NN', 'I-NP', 'O', 'N').
 	        // ba('S[dcl]',
 	        result.append(",\n");
 	        printIndent(currentIndent);
-	        String cat = node.getCategory().toString().toLowerCase();
-	        cat = cat.replaceAll("\\[([a-z]+)\\]", ":$1");
+	        String cat = node.getCategory().toProlog();
 	        result.append(getRuleName(node.getRuleType()) + "(" + cat);
 	        currentIndent++;    
 	        node.leftChild.accept(this);
@@ -596,10 +589,8 @@ w(2, 3, 'cake', 'cake', 'NN', 'I-NP', 'O', 'N').
 	        // lx('N','NP',
 	        result.append(",\n");
 	        printIndent(currentIndent);
-	        String cat = node.getCategory().toString().toLowerCase();
-	        cat = cat.replaceAll("\\[([a-z]+)\\]", ":$1");
-	        String cat_c = node.child.getCategory().toString().toLowerCase();
-	        cat_c = cat_c.replaceAll("\\[([a-z]+)\\]", ":$1");
+	        String cat = node.getCategory().toProlog();
+	        String cat_c = node.child.getCategory().toProlog();
 	        result.append("lx(" + cat + ", " + cat_c);
 	        currentIndent++;        
 	        node.child.accept(this);
