@@ -38,4 +38,4 @@ To get Prolog output for Boxer 2.x, use (note that this outputs fake lemmas):
 
 To constrain selected tokens to a specific supertag, use:
 
-    echo "parse|(S[b]\\NP)/NP me|" | java -jar easyccg.jar -model model
+    echo "parse|(S[b]\\NP)/NP me|" | java -jar easyccg.jar -model model -i supertagconstrained
