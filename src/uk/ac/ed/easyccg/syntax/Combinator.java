@@ -34,24 +34,12 @@ public abstract class Combinator
   public abstract boolean headIsLeft(Category left, Category right);
 
   public final static Collection<Combinator> STANDARD_COMBINATORS = new ArrayList<Combinator>(Arrays.asList(
-      // The following application combinators have been modified from the
-      // original EasyCCG in that they also allow the slash of the functor
-      // category to be Slash.EITHER.
       new ForwardApplication(), 
-      new BackwardApplication(),
-      // The following are the directional combinators from the original
-      // EasyCCG (used for English) and non-directional rules where the slash
-      // of both the top functor and the bottom functor have to be vertical
-      // (experimentally used for other languages). Mixing leaning and vertical
-      // slashes is not currently supported.
+      new BackwardApplication(), 
       new ForwardComposition(Slash.FWD, Slash.FWD, Slash.FWD),
-      new ForwardComposition(Slash.EITHER, Slash.EITHER, Slash.EITHER),
       new BackwardComposition(Slash.FWD, Slash.BWD, Slash.FWD),
-      new BackwardComposition(Slash.EITHER, Slash.EITHER, Slash.EITHER),
       new GeneralizedForwardComposition(Slash.FWD, Slash.FWD, Slash.FWD),
-      new GeneralizedForwardComposition(Slash.EITHER, Slash.EITHER, Slash.EITHER),
       new GeneralizedBackwardComposition(Slash.FWD, Slash.BWD, Slash.FWD),
-      new GeneralizedBackwardComposition(Slash.EITHER, Slash.EITHER, Slash.EITHER),
       new Conjunction(), 
       new RemovePunctuation(false),
       new RemovePunctuationLeft()
@@ -247,7 +235,7 @@ public abstract class Combinator
     @Override
     public boolean canApply(Category left, Category right)
     {
-      return left.isFunctor() && (left.getSlash() == Slash.FWD || left.getSlash() == Slash.EITHER) && left.getRight().matches(right);
+      return left.isFunctor() && left.getSlash() == Slash.FWD && left.getRight().matches(right);
     }
 
     @Override
@@ -279,7 +267,7 @@ public abstract class Combinator
     @Override
     public boolean canApply(Category left, Category right)
     {
-      return right.isFunctor() && (right.getSlash() == Slash.BWD || right.getSlash() == Slash.EITHER) && right.getRight().matches(left);
+      return right.isFunctor() && right.getSlash() == Slash.BWD && right.getRight().matches(left);
     }
 
     @Override
