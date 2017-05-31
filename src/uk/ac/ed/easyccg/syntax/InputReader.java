@@ -185,8 +185,7 @@ public abstract class InputReader
     @Override
     public InputToParser readInput(String line)
     {
-      //TODO quotes
-      return InputToParser.fromTokens(Arrays.asList(line.replaceAll("\"", "").replaceAll("  +", " ").trim().split(" ")));
+      return InputToParser.fromTokens(Arrays.asList(line.trim().split(" ")));
     }
   }
   
