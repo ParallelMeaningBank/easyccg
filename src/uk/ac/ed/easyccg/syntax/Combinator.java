@@ -36,8 +36,10 @@ public abstract class Combinator
   public final static Collection<Combinator> STANDARD_COMBINATORS = new ArrayList<Combinator>(Arrays.asList(
       new ForwardApplication(), 
       new BackwardApplication(), 
-      new ForwardComposition(Slash.FWD, Slash.FWD, Slash.FWD),
-      new BackwardComposition(Slash.FWD, Slash.BWD, Slash.FWD),
+      new ForwardComposition(Slash.FWD, Slash.FWD, Slash.FWD), // harmonic
+      new BackwardComposition(Slash.FWD, Slash.BWD, Slash.FWD), // crossed
+      new ForwardComposition(Slash.FWD, Slash.BWD, Slash.BWD), // crossed
+      new BackwardComposition(Slash.BWD, Slash.BWD, Slash.BWD), // harmonic
       new GeneralizedForwardComposition(Slash.FWD, Slash.FWD, Slash.FWD),
       new GeneralizedBackwardComposition(Slash.FWD, Slash.BWD, Slash.FWD),
       new Conjunction(), 
