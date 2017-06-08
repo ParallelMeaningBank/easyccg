@@ -52,7 +52,7 @@ public class EasyCCG
     @Option(shortName="f", defaultValue="", description = "(Optional) Path to the input text file. Otherwise, the parser will read from stdin.")
     File getInputFile();
 
-    @Option(shortName="i", defaultValue="tokenized", description = "(Optional) Input Format: one of \"tokenized\", \"POStagged\", \"POSandNERtagged\", \"gold\", \"deps\" or \"supertagged\"")
+    @Option(shortName="i", defaultValue="tokenized", description = "(Optional) Input Format: one of \"tokenized\", \"POStagged\", \"POSandNERtagged\", \"gold\", \"deps\", \"supertagged\" or \"constrained\"")
     String getInputFormat();
 
     @Option(shortName="o", description = "Output Format: one of \"ccgbank\", \"html\", \"prolog\", or \"boxer\"", defaultValue="ccgbank")
@@ -98,7 +98,7 @@ public class EasyCCG
 
   // Set of supported InputFormats
   public enum InputFormat {
-    TOKENIZED, GOLD, SUPERTAGGED, POSTAGGED, POSANDNERTAGGED, SUPERTAGCONSTRAINED;
+    TOKENIZED, GOLD, SUPERTAGGED, POSTAGGED, POSANDNERTAGGED, SUPERTAGCONSTRAINED, CONSTRAINED;
   }
 
   // Set of supported OutputFormats

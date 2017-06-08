@@ -5,6 +5,9 @@
  */
 package uk.ac.ed.easyccg.syntax;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A SpanConstraints object represents a set of constraints imposed on the
  * parse of a sentence. Each span constraint is a span that <b>should be
@@ -12,19 +15,16 @@ package uk.ac.ed.easyccg.syntax;
  * @author Kilian Evang
  */
 class SpanConstraints {
-
-  public static final SpanConstraints EMPTY = new SpanConstraints(new int[][]{});
   
-  private final int[][] constraints;
+  private final List<int[]> constraints = new ArrayList<>();
   
   /**
-   * Create a set of span constraints.
-   * @param constraints The constraints - each represented as an int[] array
-   * with two elements, the first being the start offset of the constraint,
-   * and the second its length.
+   * Adds a new span constraint.
+   * @param startOfSpan start offset of the constraint
+   * @param spanLength length of the constraint
    */
-  public SpanConstraints(int[][] constraints) {
-    this.constraints = constraints;
+  public void addConstraint(final int startOfSpan, final int spanLength) {
+    constraints.add(new int[] {startOfSpan, spanLength});
   }
   
   /**
