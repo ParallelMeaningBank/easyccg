@@ -40,8 +40,10 @@ public abstract class Combinator
       new BackwardComposition(Slash.FWD, Slash.BWD, Slash.FWD), // crossed
       new ForwardComposition(Slash.FWD, Slash.BWD, Slash.BWD), // crossed
       new BackwardComposition(Slash.BWD, Slash.BWD, Slash.BWD), // harmonic
-      new GeneralizedForwardComposition(Slash.FWD, Slash.FWD, Slash.FWD),
-      new GeneralizedBackwardComposition(Slash.FWD, Slash.BWD, Slash.FWD),
+      new GeneralizedForwardComposition(Slash.FWD, Slash.FWD, Slash.FWD), // harmonic
+      new GeneralizedBackwardComposition(Slash.FWD, Slash.BWD, Slash.FWD), // crossed
+      new GeneralizedForwardComposition(Slash.FWD, Slash.BWD, Slash.BWD), // crossed
+      new GeneralizedBackwardComposition(Slash.BWD, Slash.BWD, Slash.BWD), // harmonic
       new Conjunction(), 
       new RemovePunctuation(false),
       new RemovePunctuationLeft()
