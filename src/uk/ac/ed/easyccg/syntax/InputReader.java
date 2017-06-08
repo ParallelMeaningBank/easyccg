@@ -97,17 +97,23 @@ public abstract class InputReader
           supertagConstraints.add(null);
       }
     }*/
-    InputToParser(List<InputWord> words, List<Category> goldCategories, List<List<SyntaxTreeNodeLeaf>> inputSupertags, boolean isAlreadyTagged, List<List<SyntaxTreeNodeLeaf>> supertagConstraints)
+    InputToParser(List<InputWord> words, List<Category> goldCategories,
+            List<List<SyntaxTreeNodeLeaf>> inputSupertags,
+            boolean isAlreadyTagged,
+            List<List<SyntaxTreeNodeLeaf>> supertagConstraints,
+            SpanConstraints spanConstraints)
     {
       this.words = words;
       this.goldCategories = goldCategories;
       this.inputSupertags = inputSupertags;
       this.isAlreadyTagged = isAlreadyTagged;
       this.supertagConstraints = supertagConstraints;
+      this.spanConstraints = spanConstraints;
     }
     private final List<Category> goldCategories;
     private final List<List<SyntaxTreeNodeLeaf>> inputSupertags;
     private final List<List<SyntaxTreeNodeLeaf>> supertagConstraints;
+    private final SpanConstraints spanConstraints;
     public int length()
     {
       return words.size();
@@ -134,6 +140,15 @@ public abstract class InputReader
     public List<List<SyntaxTreeNodeLeaf>> getSupertagConstraints()
     {
         return supertagConstraints;
+    }
+    
+    /**
+     * @return Span constraints imposed upon this sentence, which the parser
+     * should respect.
+     */
+    public SpanConstraints getSpanConstraints()
+    {
+        return spanConstraints;
     }
     
     public List<SyntaxTreeNodeLeaf> getInputSupertags1best()
@@ -174,7 +189,7 @@ public abstract class InputReader
       for (String word : tokens) {
         inputWords.add(new InputWord(word, null, null));
       }
-      return new InputToParser(inputWords, null, null, false, null);
+      return new InputToParser(inputWords, null, null, false, null, SpanConstraints.EMPTY);
     }
     
   }
@@ -225,7 +240,7 @@ public abstract class InputReader
              
       }
       
-      return new InputToParser(words, null, null, false, supertagConstraints);
+      return new InputToParser(words, null, null, false, supertagConstraints, SpanConstraints.EMPTY);
     }
     
   }
@@ -269,7 +284,7 @@ public abstract class InputReader
         supertags.add(entries);
       }
       
-      return new InputToParser(words, null, supertags, true, null);
+      return new InputToParser(words, null, supertags, true, null, SpanConstraints.EMPTY);
     }
     
   }
@@ -298,7 +313,7 @@ public abstract class InputReader
         result.add(category);
         supertags.add(Arrays.asList(nodeFactory.makeTerminal(word, category, pos, null, 1.0, supertags.size())));
       }
-      return new InputToParser(words, result, supertags, false, null);
+      return new InputToParser(words, result, supertags, false, null, SpanConstraints.EMPTY);
     }    
     
     private GoldInputReader(SyntaxTreeNodeFactory nodeFactory)
@@ -322,7 +337,7 @@ public abstract class InputReader
         if (taggedFields[0].equals("\"")) continue ; //TODO quotes
         inputWords.add(new InputWord(taggedFields[0], taggedFields[1], null));
       }
-      return new InputToParser(inputWords, null, null, false, null);
+      return new InputToParser(inputWords, null, null, false, null, SpanConstraints.EMPTY);
     }    
   }
   
@@ -341,7 +356,7 @@ public abstract class InputReader
         		"The C&C can produce this format using: \"bin/pos -model models/pos | bin/ner -model models/ner -ofmt \"%w|%p|%n \\n\"\"" );
         inputWords.add(new InputWord(taggedFields[0], taggedFields[1], taggedFields[2]));
       }
-      return new InputToParser(inputWords, null, null, false, null);
+      return new InputToParser(inputWords, null, null, false, null, SpanConstraints.EMPTY);
     }    
   }
 

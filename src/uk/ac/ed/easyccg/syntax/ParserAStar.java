@@ -274,7 +274,7 @@ public class ParserAStar implements Parser
     
     try{
       parsingTimeOnly.start();
-      List<SyntaxTreeNode> parses = parseAstar(supertags);
+      List<SyntaxTreeNode> parses = parseAstar(supertags, input.getSpanConstraints());
       return parses;
     } finally {
       parsingTimeOnly.stop();
@@ -337,7 +337,7 @@ public class ParserAStar implements Parser
    * 
    * Returns null if the parse fails.
    */
-  private List<SyntaxTreeNode> parseAstar(List<List<SyntaxTreeNodeLeaf>> supertags) {
+  private List<SyntaxTreeNode> parseAstar(List<List<SyntaxTreeNodeLeaf>> supertags, SpanConstraints spanConstraints) {
 
     final int sentenceLength = supertags.size();
     final PriorityQueue<AgendaItem> agenda = new PriorityQueue<ParserAStar.AgendaItem>();
@@ -396,6 +396,9 @@ public class ParserAStar implements Parser
         
         // See if the new entry can be the left argument of any binary rules.
         for (int spanLength = agendaItem.spanLength + 1; spanLength < 1 + sentenceLength - agendaItem.startOfSpan; spanLength++) {
+          if (!spanConstraints.accept(agendaItem.startOfSpan, spanLength)) {
+            continue;
+          }
           SyntaxTreeNode leftEntry = agendaItem.parse;
           ChartCell rightCell = chart[agendaItem.startOfSpan + agendaItem.spanLength][spanLength - agendaItem.spanLength - 1];
           if (rightCell == null) continue ;
@@ -406,7 +409,10 @@ public class ParserAStar implements Parser
         
         // See if the new entry can be the right argument of any binary rules.
         for (int startOfSpan = 0; startOfSpan < agendaItem.startOfSpan; startOfSpan++) {
-          int spanLength = agendaItem.startOfSpan + agendaItem.spanLength - startOfSpan; 
+          int spanLength = agendaItem.startOfSpan + agendaItem.spanLength - startOfSpan;
+          if (!spanConstraints.accept(startOfSpan, spanLength)) {
+            continue;
+          }
           SyntaxTreeNode rightEntry = agendaItem.parse;
           ChartCell leftCell = chart[startOfSpan][spanLength - agendaItem.spanLength - 1];
           if (leftCell == null) continue ;
