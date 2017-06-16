@@ -42,8 +42,11 @@ public abstract class Combinator
       new BackwardComposition(Slash.BWD, Slash.BWD, Slash.BWD), // harmonic
       new GeneralizedForwardComposition(Slash.FWD, Slash.FWD, Slash.FWD), // harmonic
       new GeneralizedBackwardComposition(Slash.FWD, Slash.BWD, Slash.FWD), // crossed
-      new GeneralizedForwardComposition(Slash.FWD, Slash.BWD, Slash.BWD), // crossed
-      new GeneralizedBackwardComposition(Slash.BWD, Slash.BWD, Slash.BWD), // harmonic
+      // FIXME: re-enable the following two after fixing harmonic/crossing
+      // marking of composition rules and completing the implementation of
+      // normal-form constraints.
+      // new GeneralizedForwardComposition(Slash.FWD, Slash.BWD, Slash.BWD), // crossed
+      // new GeneralizedBackwardComposition(Slash.BWD, Slash.BWD, Slash.BWD), // harmonic
       new Conjunction(), 
       new RemovePunctuation(false),
       new RemovePunctuationLeft()
@@ -302,7 +305,7 @@ public abstract class Combinator
 
     private ForwardComposition(Slash left, Slash right, Slash result)
     {
-      super(RuleType.FC);      
+      super(RuleType.FC); // FIXME only harmonic if left == right    
       this.leftSlash = left;
       this.rightSlash = right;
       this.resultSlash = result;
@@ -342,7 +345,7 @@ public abstract class Combinator
 
     private GeneralizedForwardComposition(Slash left, Slash right, Slash result)
     {
-      super(RuleType.GFC);      
+      super(RuleType.GFC); // FIXME only harmonic if left == right
       this.leftSlash = left;
       this.rightSlash = right;
       this.resultSlash = result;
@@ -388,7 +391,7 @@ public abstract class Combinator
 
     private GeneralizedBackwardComposition(Slash left, Slash right, Slash result)
     {
-      super(RuleType.GBX);      
+      super(RuleType.GBX); // FIXME only crossing if left != right!
       this.leftSlash = left;
       this.rightSlash = right;
       this.resultSlash = result;
@@ -435,7 +438,7 @@ public abstract class Combinator
 
     private BackwardComposition(Slash left, Slash right, Slash result)
     {
-      super(RuleType.BX);      
+      super(RuleType.BX); // FIXME only crossed if left != right  
       this.leftSlash = left;
       this.rightSlash = right;
       this.resultSlash = result;

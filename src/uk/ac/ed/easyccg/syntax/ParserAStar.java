@@ -496,6 +496,8 @@ public class ParserAStar implements Parser
     }
     
     for (RuleProduction production : getRules(leftChild.getCategory(), rightChild.getCategory())) {
+      // FIXME Implementation of normal form constraints is incomplete, does not
+      // cover FXC, GFXC, BC, GBC.
       if ((leftChild.getRuleType() == RuleType.FC || leftChild.getRuleType() == RuleType.GFC) && 
           (production.ruleType == RuleType.FA || production.ruleType == RuleType.FC || production.ruleType == RuleType.GFC)) {
         // Eisner normal form constraint.
