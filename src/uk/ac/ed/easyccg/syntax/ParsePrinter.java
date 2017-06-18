@@ -358,12 +358,12 @@ w(2, 3, 'cake', 'cake', 'NN', 'I-NP', 'O', 'N').
       case FA : return "fa";
       case BA : return "ba";
       case FC : return "fc";
-      case BX : return "bx";
+      case BXC : return "bx";
       case CONJ : return "conj";
       case RP : return "rp";
       case LP : return "lp";
       case GFC : return "gfc";
-      case GBX : return "gbx";
+      case GBXC : return "gbx";
       }
 
       throw new RuntimeException("Unknown rule type: " + combinator);
@@ -477,12 +477,16 @@ w(2, 3, 'cake', 'cake', 'NN', 'I-NP', 'O', 'N').
 	      case FA : return "fa";
 	      case BA : return "ba";
 	      case FC : return "fc";
-	      case BX : return "bxc";
+	      case BXC : return "bxc";
+              case FXC : return "fxc";
+              case BC : return "bc";
 	      case CONJ : return "conj";
 	      case RP : return "rp";
 	      case LP : return "lp";
 	      case GFC : return "gfc";
-	      case GBX : return "gbxc";
+	      case GBXC : return "gbxc";
+              case GFXC : return "gfxc";
+              case GBC : return "gbc";
 	      }
 	      
 	      throw new RuntimeException("Unknown rule type: " + combinator);

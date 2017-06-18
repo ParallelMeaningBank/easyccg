@@ -11,7 +11,7 @@ import uk.ac.ed.easyccg.syntax.Category.Slash;
 public abstract class Combinator
 {
   public enum RuleType {
-    FA, BA, FC, BX, GFC, GBX, CONJ, RP, LP, NOISE, UNARY, LEXICON
+    FA, BA, FC, BXC, FXC, BC, GFC, GBXC, GFXC, GBC, CONJ, RP, LP, NOISE, UNARY, LEXICON
   }
   
   private Combinator(RuleType ruleType)
@@ -391,7 +391,7 @@ public abstract class Combinator
 
     private GeneralizedBackwardComposition(Slash left, Slash right, Slash result)
     {
-      super(RuleType.GBX); // FIXME only crossing if left != right!
+      super(RuleType.GBXC); // FIXME only crossing if left != right!
       this.leftSlash = left;
       this.rightSlash = right;
       this.resultSlash = result;
@@ -438,7 +438,7 @@ public abstract class Combinator
 
     private BackwardComposition(Slash left, Slash right, Slash result)
     {
-      super(RuleType.BX); // FIXME only crossed if left != right  
+      super(RuleType.BXC); // FIXME only crossed if left != right  
       this.leftSlash = left;
       this.rightSlash = right;
       this.resultSlash = result;

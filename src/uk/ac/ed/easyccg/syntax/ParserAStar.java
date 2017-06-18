@@ -502,8 +502,8 @@ public class ParserAStar implements Parser
           (production.ruleType == RuleType.FA || production.ruleType == RuleType.FC || production.ruleType == RuleType.GFC)) {
         // Eisner normal form constraint.
         continue;
-      } else if ((rightChild.getRuleType() == RuleType.BX || leftChild.getRuleType() == RuleType.GBX) && 
-                (production.ruleType == RuleType.BA || production.ruleType == RuleType.BX || leftChild.getRuleType() == RuleType.GBX)) {
+      } else if ((rightChild.getRuleType() == RuleType.BXC || leftChild.getRuleType() == RuleType.GBXC) && 
+                (production.ruleType == RuleType.BA || production.ruleType == RuleType.BXC || leftChild.getRuleType() == RuleType.GBXC)) {
         // Eisner normal form constraint.
         continue;
       } else if (leftChild.getRuleType() == RuleType.UNARY && 
