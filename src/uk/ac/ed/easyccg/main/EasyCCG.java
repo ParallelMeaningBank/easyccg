@@ -37,6 +37,7 @@ import uk.co.flamingpenguin.jewel.cli.Option;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Multimap;
+import uk.ac.ed.easyccg.syntax.Combinator;
 
 public class EasyCCG
 {
@@ -66,6 +67,9 @@ public class EasyCCG
 
     @Option(shortName="r", defaultValue={"S[dcl]", "S[wq]", "S[q]", "S[qem]", "NP"}, description = "(Optional) List of valid categories for the root node of the parse. Defaults to: S[dcl] S[wq] S[q] NP")
     List<String> getRootCategories();
+    
+    @Option(shortName="e", defaultValue="true", description="Apply English-specific restrictions to the standard combinators.")
+    boolean getEnglish();
 
     @Option(shortName="s", description = "(Optional) Allow rules not involving category combinations seen in CCGBank. Slows things down by around 20%.")
     boolean getUnrestrictedRules();
@@ -128,6 +132,13 @@ public class EasyCCG
       TagDict.writeTagDict(tagDict, commandLineOptions.getModel());
       System.exit(0);
     }
+    
+    final Collection<Combinator> standardCombinators;
+    if (commandLineOptions.getEnglish()) {
+      standardCombinators = Combinator.ENGLISH_COMBINATORS;
+    } else {
+      standardCombinators = Combinator.GENERIC_COMBINATORS;
+    }
 
     if (!commandLineOptions.getModel().exists()) throw new InputMismatchException("Couldn't load model from from: " + commandLineOptions.getModel());
     System.err.println("Loading model...");
@@ -139,6 +150,7 @@ public class EasyCCG
         commandLineOptions.getNbestbeam(),
         input,
         commandLineOptions.getRootCategories(),
+        standardCombinators,
         new File(commandLineOptions.getModel(), "unaryRules"),
         new File(commandLineOptions.getModel(), "binaryRules"),
         commandLineOptions.getUnrestrictedRules() ? null : new File(commandLineOptions.getModel(), "seenRules")

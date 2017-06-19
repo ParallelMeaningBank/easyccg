@@ -33,20 +33,37 @@ public abstract class Combinator
 
   public abstract boolean headIsLeft(Category left, Category right);
 
-  public final static Collection<Combinator> STANDARD_COMBINATORS = new ArrayList<Combinator>(Arrays.asList(
+  /**
+   * The original set of combinators with some restrictions for parsing English,
+   * e.g., no crossed forward composition, no harmonic backward composition,
+   * certain restrictions on the categories in backward composition.
+   */
+  public final static Collection<Combinator> ENGLISH_COMBINATORS = new ArrayList<Combinator>(Arrays.asList(
       new ForwardApplication(), 
       new BackwardApplication(), 
-      new ForwardComposition(Slash.FWD, Slash.FWD, Slash.FWD), // harmonic
-      new BackwardComposition(Slash.FWD, Slash.BWD, Slash.FWD), // crossed
-      new ForwardComposition(Slash.FWD, Slash.BWD, Slash.BWD), // crossed
-      new BackwardComposition(Slash.BWD, Slash.BWD, Slash.BWD), // harmonic
-      new GeneralizedForwardComposition(Slash.FWD, Slash.FWD, Slash.FWD), // harmonic
-      new GeneralizedBackwardComposition(Slash.FWD, Slash.BWD, Slash.FWD), // crossed
-      // FIXME: re-enable the following two after fixing harmonic/crossing
-      // marking of composition rules and completing the implementation of
-      // normal-form constraints.
-      // new GeneralizedForwardComposition(Slash.FWD, Slash.BWD, Slash.BWD), // crossed
-      // new GeneralizedBackwardComposition(Slash.BWD, Slash.BWD, Slash.BWD), // harmonic
+      new ForwardComposition(RuleType.FC, Slash.FWD, Slash.FWD, Slash.FWD), // harmonic
+      new BackwardComposition(RuleType.BXC, Slash.FWD, Slash.BWD, Slash.FWD, true), // crossed, categories restricted for English
+      new GeneralizedForwardComposition(RuleType.GFC, Slash.FWD, Slash.FWD, Slash.FWD), // harmonic
+      new GeneralizedBackwardComposition(RuleType.GBXC, Slash.FWD, Slash.BWD, Slash.FWD), // crossed
+      new Conjunction(), 
+      new RemovePunctuation(false),
+      new RemovePunctuationLeft()
+      ));
+  
+  /**
+   * The generic multilingual set of combinators.
+   */
+  public final static Collection<Combinator> GENERIC_COMBINATORS = new ArrayList<Combinator>(Arrays.asList(
+      new ForwardApplication(), 
+      new BackwardApplication(), 
+      new ForwardComposition(RuleType.FC, Slash.FWD, Slash.FWD, Slash.FWD), // harmonic
+      new BackwardComposition(RuleType.BXC, Slash.FWD, Slash.BWD, Slash.FWD, false), // crossed
+      new ForwardComposition(RuleType.FXC, Slash.FWD, Slash.BWD, Slash.BWD), // crossed
+      new BackwardComposition(RuleType.BC, Slash.BWD, Slash.BWD, Slash.BWD, false), // harmonic
+      new GeneralizedForwardComposition(RuleType.GFC, Slash.FWD, Slash.FWD, Slash.FWD), // harmonic
+      new GeneralizedBackwardComposition(RuleType.GBXC, Slash.FWD, Slash.BWD, Slash.FWD), // crossed
+      new GeneralizedForwardComposition(RuleType.GFXC, Slash.FWD, Slash.BWD, Slash.BWD), // crossed
+      new GeneralizedBackwardComposition(RuleType.GBC, Slash.BWD, Slash.BWD, Slash.BWD), // harmonic
       new Conjunction(), 
       new RemovePunctuation(false),
       new RemovePunctuationLeft()
@@ -303,9 +320,9 @@ public abstract class Combinator
     private final Slash rightSlash;
     private final Slash resultSlash;
 
-    private ForwardComposition(Slash left, Slash right, Slash result)
+    private ForwardComposition(RuleType ruleType, Slash left, Slash right, Slash result)
     {
-      super(RuleType.FC); // FIXME only harmonic if left == right    
+      super(ruleType);
       this.leftSlash = left;
       this.rightSlash = right;
       this.resultSlash = result;
@@ -343,9 +360,9 @@ public abstract class Combinator
     private final Slash rightSlash;
     private final Slash resultSlash;
 
-    private GeneralizedForwardComposition(Slash left, Slash right, Slash result)
+    private GeneralizedForwardComposition(RuleType ruleType, Slash left, Slash right, Slash result)
     {
-      super(RuleType.GFC); // FIXME only harmonic if left == right
+      super(ruleType);
       this.leftSlash = left;
       this.rightSlash = right;
       this.resultSlash = result;
@@ -383,15 +400,14 @@ public abstract class Combinator
     }
   }
   
-  
   private static class GeneralizedBackwardComposition extends Combinator {
     private final Slash leftSlash;
     private final Slash rightSlash;
     private final Slash resultSlash;
 
-    private GeneralizedBackwardComposition(Slash left, Slash right, Slash result)
+    private GeneralizedBackwardComposition(RuleType ruleType, Slash left, Slash right, Slash result)
     {
-      super(RuleType.GBXC); // FIXME only crossing if left != right!
+      super(ruleType);
       this.leftSlash = left;
       this.rightSlash = right;
       this.resultSlash = result;
@@ -428,20 +444,21 @@ public abstract class Combinator
       if (right.isModifier() || right.isTypeRaised()) return true;
       return false;
     }
-  }
-  
+  }  
   
   private static class BackwardComposition extends Combinator {
     private final Slash leftSlash;
     private final Slash rightSlash;
     private final Slash resultSlash;
+    private final boolean english;
 
-    private BackwardComposition(Slash left, Slash right, Slash result)
+    private BackwardComposition(RuleType ruleType, Slash left, Slash right, Slash result, boolean english)
     {
-      super(RuleType.BXC); // FIXME only crossed if left != right  
+      super(ruleType);
       this.leftSlash = left;
       this.rightSlash = right;
       this.resultSlash = result;
+      this.english = english;
     }
     
     @Override
@@ -451,7 +468,7 @@ public abstract class Combinator
              right.isFunctor() && 
              right.getRight().matches(left.getLeft()) && 
              left.getSlash() == leftSlash && right.getSlash() == rightSlash &&
-             !(left.getLeft().isNounOrNP()); // Additional constraint from Steedman (2000)
+             !(english && left.getLeft().isNounOrNP()); // Additional constraint from Steedman (2000)
     }
 
     @Override

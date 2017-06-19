@@ -37,10 +37,10 @@ public class ParserAStar implements Parser
 {
 
   public ParserAStar(
-      Tagger tagger, int maxSentenceLength, int nbest, double nbestBeam, InputFormat inputFormat, List<String> validRootCategories, 
-      File unaryRulesFile,
-      File extraCombinatorsFile,
-      File seenRulesFile) 
+      Tagger tagger, int maxSentenceLength, int nbest, double nbestBeam,
+      InputFormat inputFormat, List<String> validRootCategories,
+      Collection<Combinator> standardCombinators, File unaryRulesFile,
+      File extraCombinatorsFile, File seenRulesFile) 
   throws IOException {
     this.tagger = tagger;
     this.maxLength = maxSentenceLength;
@@ -51,7 +51,7 @@ public class ParserAStar implements Parser
     this.seenRules = new SeenRules(seenRulesFile);
     this.nbestBeam = Math.log(nbestBeam);
     
-    List<Combinator> combinators = new ArrayList<Combinator>(Combinator.STANDARD_COMBINATORS);
+    List<Combinator> combinators = new ArrayList<>(standardCombinators);
     
     if (extraCombinatorsFile.exists()) {
       combinators.addAll(Combinator.loadSpecialCombinators(extraCombinatorsFile));
