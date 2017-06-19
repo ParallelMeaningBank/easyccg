@@ -68,8 +68,8 @@ public class EasyCCG
     @Option(shortName="r", defaultValue={"S[dcl]", "S[wq]", "S[q]", "S[qem]", "NP"}, description = "(Optional) List of valid categories for the root node of the parse. Defaults to: S[dcl] S[wq] S[q] NP")
     List<String> getRootCategories();
     
-    @Option(shortName="e", defaultValue="true", description="Apply English-specific restrictions to the standard combinators.")
-    boolean getEnglish();
+    @Option(shortName="g", description="Do not apply English-specific restrictions to the standard combinators.")
+    boolean getGeneric();
 
     @Option(shortName="s", description = "(Optional) Allow rules not involving category combinations seen in CCGBank. Slows things down by around 20%.")
     boolean getUnrestrictedRules();
@@ -134,7 +134,7 @@ public class EasyCCG
     }
     
     final Collection<Combinator> standardCombinators;
-    if (commandLineOptions.getEnglish()) {
+    if (commandLineOptions.getGeneric()) {
       standardCombinators = Combinator.ENGLISH_COMBINATORS;
     } else {
       standardCombinators = Combinator.GENERIC_COMBINATORS;
