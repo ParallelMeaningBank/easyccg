@@ -11,7 +11,87 @@ import uk.ac.ed.easyccg.syntax.Category.Slash;
 public abstract class Combinator
 {
   public enum RuleType {
-    FA, BA, FC, BXC, FXC, BC, GFC, GBXC, GFXC, GBC, CONJ, RP, LP, NOISE, UNARY, LEXICON
+    FA, BA, FC, BXC, FXC, BC, GFC, GBXC, GFXC, GBC, CONJ, RP, LP, NOISE, UNARY, LEXICON;
+
+    boolean isForward() {
+      switch (this) {
+        case FA:
+        case FC:
+        case FXC:
+        case GFC:
+        case GFXC:
+          return true;
+        default:
+          return false;
+      }
+    }
+
+    boolean isComp() {
+      switch (this) {
+        case FC:
+        case BXC:
+        case FXC:
+        case BC:
+        case GFC:
+        case GBXC:
+        case GFXC:
+        case GBC:
+          return true;
+        default:
+          return false;
+      }
+    }
+
+    boolean isAppOrComp1() {
+      switch (this) {
+        case FA:
+        case BA:
+        case FC:
+        case BXC:
+        case FXC:
+        case BC:
+          return true;
+        default:
+          return false;
+      }
+    }
+
+    boolean isBackward() {
+      switch (this) {
+        case BA:
+        case BC:
+        case BXC:
+        case GBC:
+        case GBXC:
+          return true;
+        default:
+          return false;
+      }
+    }
+
+    boolean isComp1() {
+      switch (this) {
+        case FC:
+        case BXC:
+        case FXC:
+        case BC:
+          return true;
+        default:
+          return false;
+      }
+    }
+
+    boolean isComp2() {
+      switch (this) {
+        case GFC:
+        case GBXC:
+        case GFXC:
+        case GBC:
+          return true;
+        default:
+          return false;
+      }
+    }
   }
   
   private Combinator(RuleType ruleType)

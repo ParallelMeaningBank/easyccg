@@ -496,29 +496,77 @@ public class ParserAStar implements Parser
     }
     
     for (RuleProduction production : getRules(leftChild.getCategory(), rightChild.getCategory())) {
-      // FIXME Implementation of normal form constraints is incomplete, does not
-      // cover FXC, GFXC, BC, GBC.
-      if ((leftChild.getRuleType() == RuleType.FC || leftChild.getRuleType() == RuleType.GFC) && 
-          (production.ruleType == RuleType.FA || production.ruleType == RuleType.FC || production.ruleType == RuleType.GFC)) {
-        // Eisner normal form constraint.
+      // Normal form constraints from Hockenmaier and Bisk (2010).
+      // Since EasyCCG does not (yet) support generalized composition with
+      // degrees > 2, the formulation is simplified.
+      final Combinator.RuleType leftRuleType = leftChild.getRuleType();
+      final Combinator.RuleType rightRuleType = rightChild.getRuleType();
+      final Combinator.RuleType resultRuleType = production.ruleType;
+      
+      // NFC 1, forward case
+      if (leftRuleType.isForward() && resultRuleType.isForward() &&
+          leftRuleType.isComp() && resultRuleType.isAppOrComp1()) {
         continue;
-      } else if ((rightChild.getRuleType() == RuleType.BXC || leftChild.getRuleType() == RuleType.GBXC) && 
-                (production.ruleType == RuleType.BA || production.ruleType == RuleType.BXC || leftChild.getRuleType() == RuleType.GBXC)) {
-        // Eisner normal form constraint.
-        continue;
-      } else if (leftChild.getRuleType() == RuleType.UNARY && 
-                 production.ruleType == RuleType.FA && leftChild.getCategory().isForwardTypeRaised()) {
-        // Hockenmaier normal form constraint.
-        continue;
-      } else if (rightChild.getRuleType() == RuleType.UNARY && 
-                 production.ruleType == RuleType.BA && rightChild.getCategory().isBackwardTypeRaised()) {
-        // Hockenmaier normal form constraint.
-        continue;
-      } else {
-        agenda.add(new AgendaItem(
-            nodeFactory.makeBinary(production.category, leftChild, rightChild, production.ruleType, production.headIsLeft),
-            outsideProbabilityUpperBound, startOfSpan, spanLength));
       }
+      
+      // NFC 1, backward case
+      if (rightRuleType.isBackward() && resultRuleType.isBackward() &&
+          rightRuleType.isComp() && resultRuleType.isAppOrComp1()) {
+        continue;
+      }
+      
+      // NFC 2, forward case
+      if (leftRuleType.isForward() && resultRuleType.isForward() &&
+          leftRuleType.isComp1() && resultRuleType.isComp()) {
+        continue;
+      }
+      
+      // NFC 2, backward case
+      if (rightRuleType.isBackward() && resultRuleType.isBackward() &&
+          rightRuleType.isComp1() && resultRuleType.isComp()) {
+        continue;
+      }
+      
+      // NFC 3 is always satsified when the composition degree is max. 2.
+      
+      // NFC 4, forward case
+      // Check for type-raised child last, for efficiency
+      if (leftRuleType == RuleType.UNARY &&
+          resultRuleType.isForward() && resultRuleType.isComp1() &&
+          rightRuleType.isBackward() && rightRuleType.isComp2() &&
+          leftChild.getCategory().isForwardTypeRaised()) {
+        continue;
+      }
+      
+      // NFC 4, backward case
+      // Check for type-raised child last, for efficiency
+      if (rightRuleType == RuleType.UNARY &&
+          resultRuleType.isBackward() && resultRuleType.isComp1() &&
+          leftRuleType.isForward() && leftRuleType.isComp2() &&
+          rightChild.getCategory().isBackwardTypeRaised()) {
+        continue;
+      }
+      
+      // NFC 5, forward case
+      // Check for type-raised child last, for efficiency
+      if (leftRuleType == RuleType.UNARY &&
+          resultRuleType == RuleType.FA &&
+          leftChild.getCategory().isForwardTypeRaised()) {
+        continue;
+      }
+      
+      // NFC 5, backward case
+      if (rightRuleType == RuleType.UNARY &&
+          resultRuleType == RuleType.BA &&
+          rightChild.getCategory().isBackwardTypeRaised()) {
+        continue;
+      }
+      
+      // NFC 6: not implemented. Should we?
+      
+      agenda.add(new AgendaItem(
+          nodeFactory.makeBinary(production.category, leftChild, rightChild, production.ruleType, production.headIsLeft),
+           outsideProbabilityUpperBound, startOfSpan, spanLength));
     }
   }
   
