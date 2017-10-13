@@ -530,34 +530,27 @@ public class ParserAStar implements Parser
       // NFC 3 is always satsified when the composition degree is max. 2.
       
       // NFC 4, forward case
-      // Check for type-raised child last, for efficiency
-      if (leftRuleType == RuleType.UNARY &&
-          resultRuleType.isForward() && resultRuleType.isComp1() &&
+      if (resultRuleType.isForward() && resultRuleType.isComp1() &&
           rightRuleType.isBackward() && rightRuleType.isComp2() &&
           leftChild.getCategory().isForwardTypeRaised()) {
         continue;
       }
       
       // NFC 4, backward case
-      // Check for type-raised child last, for efficiency
-      if (rightRuleType == RuleType.UNARY &&
-          resultRuleType.isBackward() && resultRuleType.isComp1() &&
+      if (resultRuleType.isBackward() && resultRuleType.isComp1() &&
           leftRuleType.isForward() && leftRuleType.isComp2() &&
           rightChild.getCategory().isBackwardTypeRaised()) {
         continue;
       }
       
       // NFC 5, forward case
-      // Check for type-raised child last, for efficiency
-      if (leftRuleType == RuleType.UNARY &&
-          resultRuleType == RuleType.FA &&
+      if (resultRuleType == RuleType.FA &&
           leftChild.getCategory().isForwardTypeRaised()) {
         continue;
       }
       
       // NFC 5, backward case
-      if (rightRuleType == RuleType.UNARY &&
-          resultRuleType == RuleType.BA &&
+      if (resultRuleType == RuleType.BA &&
           rightChild.getCategory().isBackwardTypeRaised()) {
         continue;
       }
