@@ -235,7 +235,8 @@ public abstract class InputReader
         if (item.equals("(")) {
           spanConstraintStarts.push(offset);
         } else if (item.equals(")")) {
-          spanConstraints.addConstraint(spanConstraintStarts.pop(), offset);
+          final int start = spanConstraintStarts.pop();
+          spanConstraints.addConstraint(start, offset - start);
         } else {
           int barIndex = item.lastIndexOf('|');
           assert barIndex >= 0;
