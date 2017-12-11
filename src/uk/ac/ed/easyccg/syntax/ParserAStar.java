@@ -325,10 +325,10 @@ public class ParserAStar implements Parser
       
       if (result == 0) {
         // All other things being equal, it works best to prefer parser with longer dependencies (i.e. non-local attachment).
-        return parse.totalDependencyLength - o.parse.totalDependencyLength;
-      } else {
-        return result;
+        result = parse.totalDependencyLength - o.parse.totalDependencyLength;
       }
+      
+      return result;
     }
   } 
 
