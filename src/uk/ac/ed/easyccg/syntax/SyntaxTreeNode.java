@@ -14,6 +14,8 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
   final double probability;
   final int hash;
   final int totalDependencyLength;
+  final int unaryRulesUsed;
+  final int argumentsDelayed;
   private final int headIndex;
   
   abstract SyntaxTreeNodeLeaf getHead();
@@ -23,6 +25,8 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
       double probability, 
       int hash, 
       int totalDependencyLength,
+      int unaryRulesUsed,
+      int argumentsDelayed,
       int headIndex
       )
   {
@@ -30,6 +34,8 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
     this.probability = probability;
     this.hash = hash;
     this.totalDependencyLength = totalDependencyLength;
+    this.unaryRulesUsed = unaryRulesUsed;
+    this.argumentsDelayed = argumentsDelayed;
     this.headIndex = headIndex;
   }
   
@@ -38,10 +44,10 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
     final boolean headIsLeft;
     final SyntaxTreeNode leftChild;
     final SyntaxTreeNode rightChild;
-    private SyntaxTreeNodeBinary(Category category, double probability, int hash, int totalDependencyLength, int headIndex,
+    private SyntaxTreeNodeBinary(Category category, double probability, int hash, int totalDependencyLength, int unaryRulesUsed, int argumentsDelayed, int headIndex,
         RuleType ruleType, boolean headIsLeft, SyntaxTreeNode leftChild, SyntaxTreeNode rightChild)
     {
-      super(category, probability, hash, totalDependencyLength, headIndex);
+      super(category, probability, hash, totalDependencyLength, unaryRulesUsed, argumentsDelayed, headIndex);
       this.ruleType = ruleType;
       this.headIsLeft = headIsLeft;
       this.leftChild = leftChild;
@@ -86,10 +92,10 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
   public static class SyntaxTreeNodeLeaf extends SyntaxTreeNode {
     private SyntaxTreeNodeLeaf(
         String word, String pos, String ner, 
-        Category category, double probability, int hash, int totalDependencyLength, int headIndex
+        Category category, double probability, int hash, int totalDependencyLength, int unaryRulesUsed, int argumentsDelayed, int headIndex
         )
     {
-      super(category, probability, hash, totalDependencyLength, headIndex);
+      super(category, probability, hash, totalDependencyLength, unaryRulesUsed, argumentsDelayed, headIndex);
       this.pos = pos;
       this.ner = ner;
       this.word = word;
@@ -152,9 +158,9 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
   }
   
   static class SyntaxTreeNodeUnary extends SyntaxTreeNode {
-    private SyntaxTreeNodeUnary(Category category, double probability, int hash, int totalDependencyLength, int headIndex, SyntaxTreeNode child)
+    private SyntaxTreeNodeUnary(Category category, double probability, int hash, int totalDependencyLength, int unaryRulesUsed, int argumentsDelayed, int headIndex, SyntaxTreeNode child)
     {
-      super(category, probability, hash, totalDependencyLength, headIndex);
+      super(category, probability, hash, totalDependencyLength, unaryRulesUsed, argumentsDelayed, headIndex);
 
       this.child = child;
     }
@@ -243,17 +249,19 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
     public SyntaxTreeNodeLeaf makeTerminal(String word, Category category, String pos, String ner, double probability, int sentencePosition) {
       return new SyntaxTreeNodeLeaf(
           word, pos, ner, category, probability, 
-          hashWords ? categoryHash[sentencePosition][category.getID()] : 0, 0, sentencePosition);
+          hashWords ? categoryHash[sentencePosition][category.getID()] : 0, 0, 0, 0, sentencePosition);
     }
     
     public SyntaxTreeNode makeUnary(Category category, SyntaxTreeNode child) {
-      return new SyntaxTreeNodeUnary(category, child.probability, child.hash, child.totalDependencyLength, child.getHeadIndex(), child);
+      return new SyntaxTreeNodeUnary(category, child.probability, child.hash, child.totalDependencyLength, child.unaryRulesUsed + 1, child.argumentsDelayed, child.getHeadIndex(), child);
     }
     
     public SyntaxTreeNode makeBinary(Category category, SyntaxTreeNode left, SyntaxTreeNode right, RuleType ruleType, boolean headIsLeft) {
       
       int totalDependencyLength = (right.getHeadIndex() - left.getHeadIndex())
                                   + left.totalDependencyLength + right.totalDependencyLength;
+      int unaryRulesUsed = left.unaryRulesUsed + right.unaryRulesUsed;
+      int argumentsDelayed = left.argumentsDelayed + right.argumentsDelayed + ruleType.getDegree();
 
       int hash;
       if (right.getCategory().isPunctuation()) {
@@ -272,6 +280,8 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
           left.probability + right.probability, // log probabilities 
           hash,  
           totalDependencyLength,
+          unaryRulesUsed,
+          argumentsDelayed,
           headIsLeft ? left.getHeadIndex() : right.getHeadIndex(),
           ruleType, 
           headIsLeft,
