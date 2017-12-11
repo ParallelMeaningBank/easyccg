@@ -323,12 +323,29 @@ public class ParserAStar implements Parser
         result = 0;
       }
       
-      if (result == 0) {
+      // Commented out below is the tie-breaking heuristic from the original
+      // EasyCCG paper. Confusingly, the implementation does the opposite of
+      // what the comment and the paper say, it prefers *shorter* dependencies!
+      
+      /*if (result == 0) {
         // All other things being equal, it works best to prefer parser with longer dependencies (i.e. non-local attachment).
         result = parse.totalDependencyLength - o.parse.totalDependencyLength;
+      }*/
+      
+      // We use this heuristic instead:
+      
+      if (result == 0) {
+          // All other things being equal, we want fewer arguments to be delayed.
+          result = parse.argumentsDelayed - o.parse.argumentsDelayed;
       }
       
       return result;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return startOfSpan + " " + spanLength + " " + parse.getCategory() + " " + cost + " " + parse.totalDependencyLength + " " + parse.unaryRulesUsed + " " + parse.argumentsDelayed;
     }
   } 
 
@@ -420,7 +437,7 @@ public class ParserAStar implements Parser
             updateAgenda(agenda, startOfSpan, spanLength, leftEntry, rightEntry, sentenceLength, outsideProbabilitiesUpperBound[startOfSpan][startOfSpan + spanLength]);
           }
         }
-      }      
+      } 
     }
 
     if (parsesFound == 0) {
@@ -557,9 +574,10 @@ public class ParserAStar implements Parser
       
       // NFC 6: not implemented. Should we?
       
-      agenda.add(new AgendaItem(
+      final AgendaItem newItem = new AgendaItem(
           nodeFactory.makeBinary(production.category, leftChild, rightChild, production.ruleType, production.headIsLeft),
-           outsideProbabilityUpperBound, startOfSpan, spanLength));
+          outsideProbabilityUpperBound, startOfSpan, spanLength);
+      agenda.add(newItem);
     }
   }
   
