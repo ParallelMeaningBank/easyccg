@@ -25,6 +25,16 @@ public abstract class Combinator
           return false;
       }
     }
+    
+    boolean isApp() {
+      switch (this) {
+        case FA:
+        case BA:
+          return true;
+        default:
+          return false;
+      }
+    }
 
     boolean isComp() {
       switch (this) {
@@ -90,6 +100,16 @@ public abstract class Combinator
           return true;
         default:
           return false;
+      }
+    }
+
+    int getDegree() {
+      if (isComp1()) {
+        return 1;
+      } else if (isComp2()) {
+        return 2;
+      } else {
+        return 0; // TODO assign type-raising rules a non-0 degree?
       }
     }
   }
