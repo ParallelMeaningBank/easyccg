@@ -209,7 +209,8 @@ public abstract class Category {
       this.isMod = left.equals(right);
 
       // X|(X|Y)
-      this.isTypeRaised = right.isFunctor() && right.getLeft().equals(left);
+      this.isTypeRaised = right.isFunctor() && right.getLeft().equals(left) && ((this.slash == Slash.FWD && right.getSlash() == Slash.BWD) || (this.slash == Slash.BWD && right.getSlash() == Slash.FWD));
+      // TODO Do we need to account for type raising with vertical slashes?
     }
 
     @Override
