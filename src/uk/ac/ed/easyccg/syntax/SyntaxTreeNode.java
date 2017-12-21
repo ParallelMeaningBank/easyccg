@@ -17,6 +17,8 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
   final int unaryRulesUsed;
   final int argumentsDelayed;
   private final int headIndex;
+  final boolean isForwardTypeRaised;
+  final boolean isBackwardTypeRaised;
   
   abstract SyntaxTreeNodeLeaf getHead();
   
@@ -27,7 +29,9 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
       int totalDependencyLength,
       int unaryRulesUsed,
       int argumentsDelayed,
-      int headIndex
+      int headIndex,
+      boolean isForwardTypeRaised,
+      boolean isBackwardTypeRaised
       )
   {
     this.category = category;
@@ -37,7 +41,17 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
     this.unaryRulesUsed = unaryRulesUsed;
     this.argumentsDelayed = argumentsDelayed;
     this.headIndex = headIndex;
+    this.isForwardTypeRaised = isForwardTypeRaised;
+    this.isBackwardTypeRaised = isBackwardTypeRaised;
   }
+
+    boolean isForwardTypeRaised() {
+        return isForwardTypeRaised;
+    }
+
+    boolean isBackwardTypeRaised() {
+        return isBackwardTypeRaised;
+    }
   
   static class SyntaxTreeNodeBinary extends SyntaxTreeNode {
     final RuleType ruleType;
@@ -47,7 +61,7 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
     private SyntaxTreeNodeBinary(Category category, double probability, int hash, int totalDependencyLength, int unaryRulesUsed, int argumentsDelayed, int headIndex,
         RuleType ruleType, boolean headIsLeft, SyntaxTreeNode leftChild, SyntaxTreeNode rightChild)
     {
-      super(category, probability, hash, totalDependencyLength, unaryRulesUsed, argumentsDelayed, headIndex);
+      super(category, probability, hash, totalDependencyLength, unaryRulesUsed, argumentsDelayed, headIndex, false, false);
       this.ruleType = ruleType;
       this.headIsLeft = headIsLeft;
       this.leftChild = leftChild;
@@ -95,7 +109,7 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
         Category category, double probability, int hash, int totalDependencyLength, int unaryRulesUsed, int argumentsDelayed, int headIndex
         )
     {
-      super(category, probability, hash, totalDependencyLength, unaryRulesUsed, argumentsDelayed, headIndex);
+      super(category, probability, hash, totalDependencyLength, unaryRulesUsed, argumentsDelayed, headIndex, false, false);
       this.pos = pos;
       this.ner = ner;
       this.word = word;
@@ -158,9 +172,9 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
   }
   
   static class SyntaxTreeNodeUnary extends SyntaxTreeNode {
-    private SyntaxTreeNodeUnary(Category category, double probability, int hash, int totalDependencyLength, int unaryRulesUsed, int argumentsDelayed, int headIndex, SyntaxTreeNode child)
+    private SyntaxTreeNodeUnary(Category category, double probability, int hash, int totalDependencyLength, int unaryRulesUsed, int argumentsDelayed, int headIndex, SyntaxTreeNode child, boolean isForwardTypeRaised, boolean isBackwardTypeRaised)
     {
-      super(category, probability, hash, totalDependencyLength, unaryRulesUsed, argumentsDelayed, headIndex);
+      super(category, probability, hash, totalDependencyLength, unaryRulesUsed, argumentsDelayed, headIndex, isForwardTypeRaised, isBackwardTypeRaised);
 
       this.child = child;
     }
@@ -252,8 +266,8 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
           hashWords ? categoryHash[sentencePosition][category.getID()] : 0, 0, 0, 0, sentencePosition);
     }
     
-    public SyntaxTreeNode makeUnary(Category category, SyntaxTreeNode child) {
-      return new SyntaxTreeNodeUnary(category, child.probability, child.hash, child.totalDependencyLength, child.unaryRulesUsed + 1, child.argumentsDelayed, child.getHeadIndex(), child);
+    public SyntaxTreeNode makeUnary(Category category, SyntaxTreeNode child, boolean isForwardTypeRaised, boolean isBackwardTypeRaised) {
+      return new SyntaxTreeNodeUnary(category, child.probability, child.hash, child.totalDependencyLength, child.unaryRulesUsed + 1, child.argumentsDelayed, child.getHeadIndex(), child, isForwardTypeRaised, isBackwardTypeRaised);
     }
     
     public SyntaxTreeNode makeBinary(Category category, SyntaxTreeNode left, SyntaxTreeNode right, RuleType ruleType, boolean headIsLeft) {

@@ -406,7 +406,7 @@ public class ParserAStar implements Parser
             break ;
           } */
           
-          agenda.add(new AgendaItem(nodeFactory.makeUnary(unaryRuleProduction, agendaItem.parse), 
+          agenda.add(new AgendaItem(nodeFactory.makeUnary(unaryRuleProduction, agendaItem.parse, unaryRuleProduction.isForwardTypeRaised(), unaryRuleProduction.isBackwardTypeRaised()), 
               outsideProbabilitiesUpperBound[agendaItem.startOfSpan][agendaItem.startOfSpan + agendaItem.spanLength],                             
               agendaItem.startOfSpan, agendaItem.spanLength));
         }
@@ -520,27 +520,33 @@ public class ParserAStar implements Parser
       final Combinator.RuleType rightRuleType = rightChild.getRuleType();
       final Combinator.RuleType resultRuleType = production.ruleType;
       
+      //System.err.println(leftChild.getCategory() + " " + rightChild.getCategory());
+      
       // NFC 1, forward case
       if (leftRuleType.isForward() && resultRuleType.isForward() &&
           leftRuleType.isComp() && resultRuleType.isAppOrComp1()) {
+          //System.err.println("nfc1f");
         continue;
       }
       
       // NFC 1, backward case
       if (rightRuleType.isBackward() && resultRuleType.isBackward() &&
           rightRuleType.isComp() && resultRuleType.isAppOrComp1()) {
+          //System.err.println("nfc1b");
         continue;
       }
       
       // NFC 2, forward case
       if (leftRuleType.isForward() && resultRuleType.isForward() &&
           leftRuleType.isComp1() && resultRuleType.isComp()) {
+          //System.err.println("nfc2f");
         continue;
       }
       
       // NFC 2, backward case
       if (rightRuleType.isBackward() && resultRuleType.isBackward() &&
           rightRuleType.isComp1() && resultRuleType.isComp()) {
+          //System.err.println("nfc2b");
         continue;
       }
       
@@ -549,30 +555,36 @@ public class ParserAStar implements Parser
       // NFC 4, forward case
       if (resultRuleType.isForward() && resultRuleType.isComp1() &&
           rightRuleType.isBackward() && rightRuleType.isComp2() &&
-          leftChild.getCategory().isForwardTypeRaised()) {
+          leftChild.isForwardTypeRaised()) {
+          //System.err.println("nfc4f");
         continue;
       }
       
       // NFC 4, backward case
       if (resultRuleType.isBackward() && resultRuleType.isComp1() &&
           leftRuleType.isForward() && leftRuleType.isComp2() &&
-          rightChild.getCategory().isBackwardTypeRaised()) {
+          rightChild.isBackwardTypeRaised()) {
+          //System.err.println("nfc4b");
         continue;
       }
       
       // NFC 5, forward case
       if (resultRuleType == RuleType.FA &&
-          leftChild.getCategory().isForwardTypeRaised()) {
+          leftChild.isForwardTypeRaised()) {
+          //System.err.println("nfc5f");
         continue;
       }
       
       // NFC 5, backward case
       if (resultRuleType == RuleType.BA &&
-          rightChild.getCategory().isBackwardTypeRaised()) {
+          rightChild.isBackwardTypeRaised()) {
+          //System.err.println("nfc4b");
         continue;
       }
       
       // NFC 6: not implemented. Should we?
+      
+      //System.err.println("ok");
       
       final AgendaItem newItem = new AgendaItem(
           nodeFactory.makeBinary(production.category, leftChild, rightChild, production.ruleType, production.headIsLeft),
