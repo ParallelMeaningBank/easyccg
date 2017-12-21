@@ -390,7 +390,7 @@ public abstract class Category {
       super(type + (feature == null ? "" : "[" + feature + "]"), semanticAnnotation);
       this.type = type;
       this.feature = feature;
-      isPunctuation = !type.matches("[A-Za-z]+") || bracketAndQuoteCategories.contains(type);
+      isPunctuation = ".".equals(type) || ",".equals(type) || bracketAndQuoteCategories.contains(type);
     }
 
     private final String type;
