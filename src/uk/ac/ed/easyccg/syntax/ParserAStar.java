@@ -339,13 +339,18 @@ public class ParserAStar implements Parser
           result = parse.argumentsDelayed - o.parse.argumentsDelayed;
       }
       
+      if (result == 0) {
+          // All other things being equal, we want fewer type raising rules.
+          result = parse.typeRaisingRulesUsed - o.parse.typeRaisingRulesUsed;
+      }
+
       return result;
     }
     
     @Override
     public String toString()
     {
-        return startOfSpan + " " + spanLength + " " + parse.getCategory() + " " + cost + " " + parse.totalDependencyLength + " " + parse.unaryRulesUsed + " " + parse.argumentsDelayed;
+        return startOfSpan + " " + spanLength + " " + parse.getCategory() + " " + cost + " " + parse.totalDependencyLength + " " + parse.typeRaisingRulesUsed + " " + parse.argumentsDelayed;
     }
   } 
 

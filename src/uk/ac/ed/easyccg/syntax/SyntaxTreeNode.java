@@ -14,7 +14,7 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
   final double probability;
   final int hash;
   final int totalDependencyLength;
-  final int unaryRulesUsed;
+  final int typeRaisingRulesUsed;
   final int argumentsDelayed;
   private final int headIndex;
   final boolean isForwardTypeRaised;
@@ -38,7 +38,7 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
     this.probability = probability;
     this.hash = hash;
     this.totalDependencyLength = totalDependencyLength;
-    this.unaryRulesUsed = unaryRulesUsed;
+    this.typeRaisingRulesUsed = unaryRulesUsed;
     this.argumentsDelayed = argumentsDelayed;
     this.headIndex = headIndex;
     this.isForwardTypeRaised = isForwardTypeRaised;
@@ -267,14 +267,20 @@ public abstract class SyntaxTreeNode implements Comparable<SyntaxTreeNode> {
     }
     
     public SyntaxTreeNode makeUnary(Category category, SyntaxTreeNode child, boolean isForwardTypeRaised, boolean isBackwardTypeRaised) {
-      return new SyntaxTreeNodeUnary(category, child.probability, child.hash, child.totalDependencyLength, child.unaryRulesUsed + 1, child.argumentsDelayed, child.getHeadIndex(), child, isForwardTypeRaised, isBackwardTypeRaised);
+      final int newTypeRaisingRulesUsed;
+      if (isForwardTypeRaised || isBackwardTypeRaised) {
+        newTypeRaisingRulesUsed = 1;
+      } else {
+        newTypeRaisingRulesUsed = 0;
+      }
+      return new SyntaxTreeNodeUnary(category, child.probability, child.hash, child.totalDependencyLength, child.typeRaisingRulesUsed + newTypeRaisingRulesUsed, child.argumentsDelayed, child.getHeadIndex(), child, isForwardTypeRaised, isBackwardTypeRaised);
     }
     
     public SyntaxTreeNode makeBinary(Category category, SyntaxTreeNode left, SyntaxTreeNode right, RuleType ruleType, boolean headIsLeft) {
       
       int totalDependencyLength = (right.getHeadIndex() - left.getHeadIndex())
                                   + left.totalDependencyLength + right.totalDependencyLength;
-      int unaryRulesUsed = left.unaryRulesUsed + right.unaryRulesUsed;
+      int unaryRulesUsed = left.typeRaisingRulesUsed + right.typeRaisingRulesUsed;
       int argumentsDelayed = left.argumentsDelayed + right.argumentsDelayed + ruleType.getDegree();
 
       int hash;
