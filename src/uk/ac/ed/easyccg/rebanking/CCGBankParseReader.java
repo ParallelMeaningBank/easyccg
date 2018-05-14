@@ -67,7 +67,7 @@ public class CCGBankParseReader
           subtermCloseBracket == closeBracket - 1)
       {
         //Unary
-        result = factory.makeUnary(cat, child1);
+        result = factory.makeUnary(cat, child1, cat.isForwardTypeRaised(), cat.isBackwardTypeRaised()); // XXX we don't know if they're type-raised
         
       }
       else

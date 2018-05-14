@@ -180,9 +180,9 @@ public abstract class Category {
     return id;
   }
 
-  abstract boolean isTypeRaised();
-  abstract boolean isForwardTypeRaised();
-  abstract boolean isBackwardTypeRaised();
+  public abstract boolean isTypeRaised();
+  public abstract boolean isForwardTypeRaised();
+  public abstract boolean isBackwardTypeRaised();
 
   public abstract boolean isModifier();
   public abstract boolean matches(Category other);
@@ -493,11 +493,13 @@ public abstract class Category {
       return false;
     }
 
+    @Override
     public boolean isForwardTypeRaised()
     {
       return false;
     }
 
+    @Override
     public boolean isBackwardTypeRaised()
     {
       return false;
