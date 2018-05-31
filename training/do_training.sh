@@ -35,7 +35,7 @@ if [[ ! -f $TRAINING_DATA/seenRules ]]; then
 fi
 
 # Do training. The supertagging model is saved in: $EMBEDDINGS/train.$NAME
-./train.sh $EMBEDDINGS 0 3 3 $TRAINING_DATA $DEV_DATA $NAME
+./train.sh $EMBEDDINGS 0 3 3 $TRAINING_DATA $DEV_DATA $NAME 0
 
 # Convert the output to a parser model, saved in: $EMBEDDINGS/model.$NAME
 mkdir $PARSING_MODEL

@@ -73,7 +73,7 @@ function SGD:processInput(input)
   return newInput
 end
 
-function SGD:train(dataset, validation)
+function SGD:train(dataset, validation, numIterations)
    self.log:write("# SGD: training" .. '\n')   
    local iteration = 1
    local currentLearningRate = self.learningRate
@@ -125,7 +125,7 @@ function SGD:train(dataset, validation)
       self.log:write("Development Set Accuracy: " .. acc .. '\n')
 
 
-      if acc > bestScore then
+      if acc > bestScore or validation:size() == 0 then
         torch.save(folder .. '/bestModel', self.module) 
         bestScore=acc
         itsSinceImprovement = 0
@@ -140,10 +140,15 @@ function SGD:train(dataset, validation)
          break
       end
 
-     if itsSinceImprovement == 1 then
-         self.log:write("# SGD: no improvement for 1 iteration. Stopping training." .. '\n')
-         break
-     end
+      if numIterations > 0 and iteration > numIterations then
+	 self.log:write("# SGD: you have reached the pre-specified number of iterations" .. '\n')
+	 break
+      end
+
+      if numIterations == 0 and itsSinceImprovement == 1 then
+          self.log:write("# SGD: no improvement for 1 iteration. Stopping training." .. '\n')
+          break
+      end
    end
 end
 

@@ -126,7 +126,7 @@ end
 
 
 
-function Train:trainModel(trainFile, validationAutoFile, validationGoldFile, embeddingsFolder, features, windowBackward, windowForward, hiddenSize, name)
+function Train:trainModel(trainFile, validationAutoFile, validationGoldFile, embeddingsFolder, features, windowBackward, windowForward, hiddenSize, name, numIterations)
 
   wordTable, embeddingsSize = self:loadEmbeddings(embeddingsFolder .. '/embeddings.vectors')
   k = 5
@@ -201,7 +201,7 @@ function Train:trainModel(trainFile, validationAutoFile, validationGoldFile, emb
   trainer = nn.SGD(mlp, criterion, folder, 3, window)
   trainer.learningRate = 0.01
   trainer.maxIteration = 25
-  trainer:train(dataset, validation)
+  trainer:train(dataset, validation, numIterations)
   return mlp
 
 end

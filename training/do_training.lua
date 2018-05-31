@@ -12,7 +12,8 @@ embeddingsFolder=arg[3];
 hidden=tonumber(arg[4]);
 windowBackward=tonumber(arg[5]);
 windowForward=tonumber(arg[6]);
-name=arg[7]
+name=arg[7];
+numIterations=tonumber(arg[8])
 
 modelFolder=embeddingsFolder .. '/train.' .. name
 
@@ -24,4 +25,4 @@ train = nn.Train()
 -- TODO: tidy this up.
 -- devFile appears twice, to allow seprate validation files with gold/auto POS tags. 
 -- It turns out that POS features don't help, so we'll default to just using the dataset with gold POS tags. 
-train:trainModel(trainFile, devFile, devFile, embeddingsFolder, features, windowBackward, windowForward, hidden, name)
+train:trainModel(trainFile, devFile, devFile, embeddingsFolder, features, windowBackward, windowForward, hidden, name, numIterations)
