@@ -135,9 +135,9 @@ public class EasyCCG
     
     final Collection<Combinator> standardCombinators;
     if (commandLineOptions.getGeneric()) {
-      standardCombinators = Combinator.ENGLISH_COMBINATORS;
-    } else {
       standardCombinators = Combinator.GENERIC_COMBINATORS;
+    } else {
+      standardCombinators = Combinator.ENGLISH_COMBINATORS;
     }
 
     if (!commandLineOptions.getModel().exists()) throw new InputMismatchException("Couldn't load model from from: " + commandLineOptions.getModel());
