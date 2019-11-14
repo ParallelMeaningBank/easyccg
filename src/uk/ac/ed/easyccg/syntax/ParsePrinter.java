@@ -550,9 +550,15 @@ w(2, 3, 'cake', 'cake', 'NN', 'I-NP', 'O', 'N').
 	    	return featureList;
 	    }
 	    
-	    // adds an escape character before single quotes
+	    // adds a backslash before single quotes and backslashes
 	    private String escape(String string) {
-	    	string = string.replace("'", "\\'");
+        StringBuilder builder = new StringBuilder();
+        for (char c : string.toCharArray()) {
+          if (c == '\\' || c == '\'') {
+            builder.append('\\');
+          }
+          builder.append(c);
+        }
 	    	return string;
 	    }
 
