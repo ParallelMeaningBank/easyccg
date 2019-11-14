@@ -559,7 +559,7 @@ w(2, 3, 'cake', 'cake', 'NN', 'I-NP', 'O', 'N').
           }
           builder.append(c);
         }
-	    	return string;
+	    	return builder.toString();
 	    }
 
 	    private void printDerivation(SyntaxTreeNode parse, int id, StringBuilder result)
